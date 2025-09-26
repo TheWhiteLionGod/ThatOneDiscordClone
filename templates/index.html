@@ -3,10 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homepage</title>
+    <title>Discord-like Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Hello World</h1>
-    <script src="{{ url_for('static', filename='scripts/index.js') }}"></script>
+    <div class="app-container">
+        <!-- Sidebar for servers -->
+        <div class="server-sidebar">
+            <div class="server-icon-wrapper active">
+                <div class="server-pill"></div>
+                <div class="server-icon">D</div>
+            </div>
+            <div class="server-icon-wrapper create-channel-btn">
+                <div class="server-pill"></div>
+                <div class="server-icon plus">+</div>
+            </div>
+        </div>
+
+        <!-- Channel list and user info -->
+        <div class="channel-sidebar">
+            <div class="server-header">
+                <span class="server-name">My Awesome Server</span>
+                <span class="server-dropdown-icon">▾</span>
+            </div>
+            <div class="channel-list-container">
+                <div class="channel-category-header">
+                    <span class="category-toggle">▾</span>
+                    <span class="category-name">TEXT CHANNELS</span>
+                </div>
+                <div class="channel-list-items visible">
+                    {% for channel in channels %}
+                    <a href="#" class="channel-link" data-channel-id="{{ channel.id }}">
+                        <span class="channel-icon">#</span>
+                        <span class="channel-name">{{ channel.name }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="user-info-tray">
+                <div class="user-info-avatar"></div>
+                <div class="user-details">
+                    <span class="user-name">{{ current_user.username }}</span>
+                    <span class="user-id">#{{ current_user.id }}</span>
+                </div>
+                <div class="user-actions">
+                    <a href="{{ url_for('logout') }}" class="action-btn" title="Logout">L</a>
+                    <button class="action-btn settings-btn" title="User Settings">⚙</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main chat area -->
+        <div class="chat-main">
+            <div class="chat-header">
+                <div class="chat-channel-name"># general</div>
+            </div>
+            <div class="message-container" id="message-container">
+                <!-- Messages will be injected here by JavaScript -->
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="message-input" placeholder="Message #general" />
+                <button id="send-button" class="action-btn" title="Send Message">Send</button>
+            </div>
+        </div>
+
+        <!-- Member list sidebar -->
+        <div class="member-sidebar">
+            <div class="member-category-header">
+                <span class="category-name">ONLINE</span>
+            </div>
+            <div class="member-list">
+                <!-- Member list will be populated by JS -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="create-channel-modal" class="modal-overlay">
+        <div class="modal-content">
+            <form action="{{ url_for('create_channel') }}" method="POST">
+                <div class="modal-header">
+                    Create New Channel
+                    <button type="button" class="modal-close-btn">×</button>
+                </div>
+                <div class="modal-body">
+                    <label for="channel_name">Channel Name</label>
+                    <input type="text" id="channel_name" name="channel_name" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="modal-button">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Other UI elements (popovers, tooltips) -->
+    <div class="popover-container user-settings-popover">...</div>
+    <div class="popover-container message-actions-popover">...</div>
+    <div id="settings-modal" class="modal-overlay">...</div>
+    <div id="loading-overlay" class="loading-overlay">...</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
